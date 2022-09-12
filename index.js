@@ -10,10 +10,10 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-morgan.token("body", (req, res) => {
-  return JSON.stringify(req.body);
-});
-app.use(morgan(":body"));
+// morgan.token("body", (req, res) => {
+//   return JSON.stringify(req.body);
+// });
+app.use(morgan("dev"));
 app.use(express.static("build"));
 
 app.use("/api/countries", countryRouter);

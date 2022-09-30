@@ -17,11 +17,10 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.static("build"));
 
-app.use("/.netlify/functions/api/countries", countryRouter);
-app.use("/.netlify/functions/api/weather", weatherRouter);
+app.use("/api/countries", countryRouter);
+app.use("/api/weather", weatherRouter);
 app.use("/", (req, res) =>
   res.sendFile(path.join(__dirname, "../../dist/index.html"))
 );
-app.use("", pingRouter);
 
 module.exports.handler = serverless(app);

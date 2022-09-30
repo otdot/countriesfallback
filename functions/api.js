@@ -4,9 +4,9 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const path = require("path");
-const pingRouter = require("./routes/pingRouter");
-const weatherRouter = require("./routes/weatherRoutes");
-const countryRouter = require("./routes/countryRoutes");
+const pingRouter = require("../routes/pingRouter");
+const weatherRouter = require("../routes/weatherRoutes");
+const countryRouter = require("../routes/countryRoutes");
 const app = express();
 
 app.use(express.json());

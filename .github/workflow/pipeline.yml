@@ -1,0 +1,63 @@
+name: Deployment pipelines
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  simple_deployment_pipeline:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - name: npm install
+        run: npm install
+      - name: lint
+        run: npm run eslint
+      - name: build
+        run: npm run build
+      - name: test
+        run: npm run test
+      - name: e2e tests
+        uses: cypress-io/github-action@v2
+        with:
+          command: npm run test:e2e
+          start: npm run dev
+          wait-on: http://localhost:3003
+  tag_release:
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Add version and push tag
+        if: ${{ success() && contains(join(toJson(github.event.commits.*.message), ' '), '#skip') != true }}
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+          WITH_V: true
+          RELEASE_BRANCHES: master
+  github_notifier:
+    needs: [tag_release]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Notification of workflow status to discord on success
+        if: ${{ success() }}
+        uses: johnnyhuy/actions-discord-git-webhook@main
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          hide_links: true
+          censor_username: true
+          repo_name: cicd_pokedex
+      - name: Send Discord notification on failure
+        if: ${{ failure() }}
+        uses: stegzilla/discord-notify@v2
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          title: Merge failure
+          message: "**${{ github.event.pull_request.title }}**\n**Creator:** ${{ github.event.pull_request.user.login }}\n${{ github.event.pull_request.html_url }}"
+          include_image: false

@@ -7,4 +7,8 @@ router.get("/", async (_req, res) => {
   res.send(countries.data);
 });
 
+router.get("/healthcheck", (_req, res) => {
+  res.status(200).send("healthcheck ok");
+});
+
 module.exports = router;

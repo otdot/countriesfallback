@@ -1,9 +1,6 @@
 name: Deployment pipelines
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 jobs:
   simple_deployment_pipeline:
